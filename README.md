@@ -3,7 +3,6 @@
 A production-grade **industrial motor control and telemetry platform** combining real-time embedded control with a modern web-based dashboard.
 
 🔗 **Live Dashboard:** https://speedcontrol.vercel.app/
-📦 **Repository:** https://github.com/Premchand006/Speed-control
 
 ---
 
