@@ -1,131 +1,224 @@
-# User-Interactive STM32 Closed-Loop V/f Induction Motor Control
+# ⚡ User-Interactive STM32 Closed-Loop V/f Induction Motor Control
 
-A professional, industrial-grade telemetry and control platform for three-phase induction motors. This project combines high-performance **STM32 firmware** with a modern **React 19** dashboard to provide real-time scalar $V/f$ control, active safety monitoring, and precision speed regulation.
+A production-grade **industrial motor control and telemetry platform** combining real-time embedded control with a modern web-based dashboard.
 
----
-
-## 📖 Table of Contents
-
-* [Project Overview](https://www.google.com/search?q=%23project-overview)
-* [Hardware Specifications](https://www.google.com/search?q=%23hardware-specifications)
-* [Control & Safety Features](https://www.google.com/search?q=%23control--safety-features)
-* [Dashboard Tech Stack](https://www.google.com/search?q=%23dashboard-tech-stack)
-* [Installation](https://www.google.com/search?q=%23installation)
-* [Usage & Telemetry](https://www.google.com/search?q=%23usage--telemetry)
-* [Credits](https://www.google.com/search?q=%23credits)
+🔗 **Live Dashboard:** https://speedcontrol.vercel.app/
+📦 **Repository:** https://github.com/Premchand006/Speed-control
 
 ---
 
-## 📝 Project Overview
+## 🚀 Project Overview
 
-This system implements a **Closed-Loop Variable Frequency Drive (VFD)** to control a 0.75 kW induction motor. By maintaining a constant Voltage-to-Frequency ($V/f$) ratio, the controller ensures constant air-gap flux and torque across a wide speed range (0–1500 RPM).
+This system implements a **Closed-Loop Variable Frequency Drive (VFD)** for a three-phase induction motor using **scalar V/f control** with feedback regulation.
 
-**Why this project?**
+The controller dynamically adjusts frequency while maintaining a constant **V/f ratio**, ensuring:
 
-* **Precision Feedback**: Uses an inductive proximity sensor and PI control for accurate RPM regulation.
-* **Hardware-Level Safety**: Real-time RMS monitoring for overcurrent and undervoltage protection.
-* **Industrial Readiness**: Implements 10 kHz SPWM with dead-time insertion to protect inverter hardware.
+* Constant air-gap flux
+* Stable torque across speed range
+* Efficient operation from **0–1500 RPM**
+
+---
+
+## 🎯 Key Highlights
+
+* 🔁 **Closed-Loop Speed Control** using PI controller
+* ⚡ **10 kHz SPWM Generation** with dead-time insertion
+* 🧠 **Real-Time Telemetry Dashboard** (React + Web Serial API)
+* 🛑 **Hardware-Level Safety Protections**
+* 📊 **Live Monitoring of Voltage, Current, Speed & Frequency**
+
+---
+
+## 🧱 System Architecture
+
+```text
+STM32 (Control + PWM)
+        ↓ UART (230400 baud)
+Web Browser (Web Serial API)
+        ↓
+React Dashboard (Vite + Tailwind)
+        ↓
+Hosted on Vercel
+```
 
 ---
 
 ## ⚙️ Hardware Specifications
 
-The system is built on a modular architecture consisting of the following core components:
+### 🧠 Control Unit
 
-1. Control & Processing 
+* **Microcontroller:** STM32F401RE (ARM Cortex-M4 @ 84 MHz)
+* **PWM:** 10 kHz SPWM via TIM1 (Advanced Timer)
+* **Communication:** UART @ 230400 baud
 
-* **Microcontroller**: STM32F401RE (ARM Cortex-M4 @ 84 MHz).
-* **PWM Generation**: 10 kHz Sinusoidal PWM (SPWM) via Advanced Timer (TIM1).
-* **Baud Rate**: High-speed UART communication at **230400** for real-time telemetry.
+### 🔌 Power Stage
 
-2. Power Electronics 
+* **Topology:** 3-Phase Voltage Source Inverter (VSI)
+* **Switches:** IRFP460N MOSFETs
+* **Motor:**
 
-* **Inverter**: 3-Phase Two-Level Voltage Source Inverter.
-* **Power Switches**: IRFP460N MOSFETs.
-* **Motor**: 0.75 kW, 415 V, 1.9 A, 4-Pole Induction Motor (1440 RPM base speed).
+  * 0.75 kW
+  * 415 V
+  * 1.9 A
+  * 4-pole (1440 RPM base)
 
-3. Sensing & Feedback 
+### 📡 Sensing & Feedback
 
-* **Current Sensing**: ACS712 Hall-Effect sensor for RMS current measurement.
-* **Voltage Sensing**: ZMPT101B for RMS output voltage monitoring.
-* **Speed Feedback**: Inductive Proximity Sensor for pulse-based RPM estimation.
-
----
-
-## ✨ Control & Safety Features
-
-* **Adaptive Soft-Start**: State machine-based frequency ramping (2 Hz to target) to prevent high inrush currents and mechanical stress.
-* **Closed-Loop PI Control**: Proportional-Integral algorithm to eliminate steady-state error under varying loads.
-* **Advanced Filtering**: Exponential Moving Average (EMA) filter on RPM data to ensure stable control signals.
-
-
-* **Integrated Protection**:
-* **Overcurrent**: Immediate PWM disable if current exceeds predefined thresholds.
-* **Undervoltage**: Disables inverter during supply dips to prevent unstable operation.
-* **RPM Timeout**: Safety shutdown if the sensor fails to detect rotation.
-* **Emergency Stop**: UART-triggered "KILL" command for instant shutdown.
+* **Current Sensor:** ACS712 (Hall-effect)
+* **Voltage Sensor:** ZMPT101B (RMS sensing)
+* **Speed Sensor:** Inductive Proximity Sensor
 
 ---
 
-## 💻 Dashboard Tech Stack
+## 🧠 Control Strategy
 
-The "MotorCtrl" frontend is a high-performance web dashboard that leverages the **Web Serial API** for driverless hardware interaction.
+### ⚡ V/f Control Principle
 
-* **Framework**: React 19.
-* **Build Tool**: Vite (for optimized asset delivery).
-* **Styling**: Tailwind CSS 4.0 (for responsive, industrial UI).
-* **Visualization**: Real-time gauges and multi-parameter history charts.
+Maintains:
+[
+\frac{V}{f} = \text{constant}
+]
+
+Ensures:
+
+* Constant magnetic flux
+* Torque stability across varying speeds
 
 ---
 
-## 🚀 Installation
+### 🔁 Closed-Loop PI Control
+
+* Eliminates steady-state error
+* Adjusts frequency dynamically based on RPM feedback
+
+---
+
+### 🧪 Signal Conditioning
+
+* **EMA Filtering** applied to RPM
+* Reduces noise and improves control stability
+
+---
+
+## 🛡️ Safety Features
+
+* ⚠️ **Overcurrent Protection** → Instant PWM shutdown
+* ⚡ **Undervoltage Protection** → Prevents unstable operation
+* ⛔ **RPM Timeout Detection** → Detects sensor failure
+* 🔴 **Emergency Stop (`KILL`)** → Immediate shutdown via UART
+* 🔄 **System Reset (`RESET`)**
+
+---
+
+## 💻 Dashboard (Frontend)
+
+Built using:
+
+* **React 19**
+* **Vite**
+* **Tailwind CSS**
+* **Web Serial API**
+
+### Features:
+
+* 🔌 One-click hardware connection (no drivers)
+* 📊 Real-time telemetry visualization
+* 🎛️ Speed control interface
+* 📈 Live parameter updates
+
+---
+
+## 📡 Communication Protocol
+
+### 📥 STM32 → Dashboard
+
+```text
+V:xx.xx, I:xx.xx, S:xxxx, F:xx.xx
+```
+
+| Parameter | Description    |
+| --------- | -------------- |
+| V         | RMS Voltage    |
+| I         | RMS Current    |
+| S         | Speed (RPM)    |
+| F         | Frequency (Hz) |
+
+---
+
+### 📤 Dashboard → STM32
+
+| Command     | Function       |
+| ----------- | -------------- |
+| `S:<value>` | Set speed      |
+| `KILL`      | Emergency stop |
+| `RESET`     | Reset system   |
+
+---
+
+## 🛠️ Local Setup
 
 ### Prerequisites
 
-* [Node.js](https://nodejs.org/) (v18.0+)
-* Browser with **Web Serial** support (Chrome, Edge)
-* STM32 Nucleo-F401RE board
+* Node.js (v18+)
+* Chrome / Edge (Web Serial support)
+* STM32 Nucleo-F401RE
 
-### Step 1: Clone & Setup
+---
+
+### Installation
 
 ```bash
 git clone https://github.com/Premchand006/Speed-control.git
 cd Speed-control
-
-```
-
-### Step 2: Install Dependencies
-
-```bash
 npm install
-
-```
-
-### Step 3: Launch
-
-```bash
 npm run dev
-
 ```
 
 ---
 
-## 🛠️ Usage & Telemetry
+## ☁️ Deployment
 
-### Data Input Format (STM32 to Dashboard)
+This project is deployed using **Vercel**:
 
-The dashboard expects a comma-separated string at **230400 baud**:
-`V:xx.xx, I:xx.xx, S:xxxx, F:xx.xx` 
+* Framework: Vite
+* Build Command: `npm run build`
+* Output Directory: `dist`
 
-* `V`: RMS Voltage 
-* `I`: RMS Current 
-* `S`: Speed (RPM) 
-* `F`: Inverter Frequency (Hz) 
+---
 
-### Control Commands (Dashboard to STM32)
+## ⚠️ Important Notes
 
-* **Set Speed**: `S:<val>\n` (e.g., `S:1500`)
-* **Emergency Stop**: `KILL\n` 
-* **Reset Safety**: `RESET\n`
+* Web Serial API requires:
+
+  * HTTPS (✔ supported via Vercel)
+  * Chrome / Edge browser
+* Hardware must be manually connected via browser prompt
+
+---
+
+## 🧠 Learning Outcomes
+
+This project demonstrates:
+
+* Embedded Systems Design (STM32, timers, PWM)
+* Power Electronics (VFD, inverter control)
+* Control Systems (PI, closed-loop feedback)
+* Real-Time Systems Integration
+* Frontend Engineering (React + hardware interface)
+
+---
+
+## 📈 Future Improvements
+
+* 🌐 IoT-based control (WiFi instead of UART)
+* ☁️ Cloud telemetry logging
+* 🤖 Predictive maintenance using ML
+* 📊 Advanced analytics dashboard
+
+---
+
+## ⭐ If you like this project
+
+Give it a ⭐ on GitHub and share it!
 
 ---
